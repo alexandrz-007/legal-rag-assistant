@@ -1,0 +1,21 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+
+# Vector DB (generated, not committed)
+chroma_db/
+
+# Documents (keep generated, ignore uploads)
+data/uploads/
+
+# Eval results
+eval/report.json
+
+# OS
+Thumbs.db
+.DS_Store

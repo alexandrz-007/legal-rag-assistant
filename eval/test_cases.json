@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question": "Какой штраф за разглашение конфиденциальной информации?",
+    "expected_source": "01_dogovor_konsultaciya.pdf",
+    "expected_keywords": ["500 000", "пятьсот тысяч"],
+    "should_answer": true,
+    "description": "Штраф в договоре консультационных услуг"
+  },
+  {
+    "id": 2,
+    "question": "Кто является ответственным за обработку персональных данных?",
+    "expected_source": "02_politika_pd.pdf",
+    "expected_keywords": ["Петров", "Александр", "Иванович"],
+    "should_answer": true,
+    "description": "Ответственный за ПД в политике"
+  },
+  {
+    "id": 3,
+    "question": "Какой срок действия обязательств по неразглашению в NDA?",
+    "expected_source": "03_nda.pdf",
+    "expected_keywords": ["5", "пять", "лет"],
+    "should_answer": true,
+    "description": "Срок NDA"
+  },
+  {
+    "id": 4,
+    "question": "Какие тарифные планы предлагает платформа LegalNet?",
+    "expected_source": "04_oferta.pdf",
+    "expected_keywords": ["Базовый", "Профессиональный", "Корпоративный"],
+    "should_answer": true,
+    "description": "Тарифы в оферте"
+  },
+  {
+    "id": 5,
+    "question": "Какой срок согласования договоров в юридическом отделе?",
+    "expected_source": "05_reglament.pdf",
+    "expected_keywords": ["3", "5", "рабочих дней"],
+    "should_answer": true,
+    "description": "Срок согласования в регламенте"
+  },
+  {
+    "id": 6,
+    "question": "Какой размер арендной платы за помещение?",
+    "expected_source": "07_dogovor_arenda.pdf",
+    "expected_keywords": ["285 000", "двести восемьдесят пять тысяч"],
+    "should_answer": true,
+    "description": "Арендная плата"
+  },
+  {
+    "id": 7,
+    "question": "Какая неустойка предусмотрена за просрочку оказания услуг?",
+    "expected_source": "01_dogovor_konsultaciya.pdf",
+    "expected_keywords": ["0,1%", "пеня"],
+    "should_answer": true,
+    "description": "Пеня за просрочку"
+  },
+  {
+    "id": 8,
+    "question": "Какой лимит исковых требований для привлечения внешних адвокатов?",
+    "expected_source": "05_reglament.pdf",
+    "expected_keywords": ["5 000 000", "пять миллионов"],
+    "should_answer": true,
+    "description": "Лимит для внешних адвокатов"
+  },
+  {
+    "id": 9,
+    "question": "Каков максимальный срок рассмотрения обращения гражданина?",
+    "expected_source": "15_reglament_obrashcheniy.pdf",
+    "expected_keywords": ["30", "тридцать", "дней"],
+    "should_answer": true,
+    "description": "Срок рассмотрения обращений"
+  },
+  {
+    "id": 10,
+    "question": "Какая температура плавления титана?",
+    "expected_source": null,
+    "expected_keywords": [],
+    "should_answer": false,
+    "description": "Вопрос вне базы — должен отказать"
+  }
+]

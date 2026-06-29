@@ -1,0 +1,16 @@
+services:
+  legal-rag:
+    build: .
+    container_name: legal-rag-assistant
+    ports:
+      - "8501:8501"
+    volumes:
+      # Документы (можно добавлять PDF без пересборки)
+      - ./data:/app/data
+      # Векторная БД (персистентность между перезапусками)
+      - ./chroma_db:/app/chroma_db
+      # .env с API ключом
+      - ./.env:/app/.env:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

@@ -1,0 +1,15 @@
+streamlit
+langchain
+langchain-community
+langchain-chroma
+langchain-huggingface
+langchain-openai
+langchain-text-splitters
+chromadb
+sentence-transformers
+rank-bm25
+pymupdf
+python-docx
+openai
+python-dotenv
+fpdf2

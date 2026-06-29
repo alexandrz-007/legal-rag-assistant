@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Виртуальные окружения
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Векторная БД (генерируется, не нужна в образе)
+chroma_db/
+
+# Временные файлы
+*.log
+*.tmp
+eval/report.json
+
+# OS
+Thumbs.db
+.DS_Store
