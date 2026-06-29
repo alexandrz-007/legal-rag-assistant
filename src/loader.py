@@ -21,17 +21,15 @@ from src.config import DOCS_DIR, UPLOAD_DIR
 
 
 def load_pdf(path: str) -> List[Document]:
-    """
-    Загрузить PDF постранично.
-
-    Возвращает список Document, по одному на страницу.
-    Метаданные: filename, page, source.
-    """
+    """Загрузить PDF постранично. Пропускает повреждённые файлы."""
     filename = os.path.basename(path)
     docs = []
 
-    # Открываем PDF
-    pdf = fitz.open(path)
+    try:
+        pdf = fitz.open(path)
+    except Exception as e:
+        print(f"  [loader] Пропуск {filename}: повреждённый PDF ({e})")
+        return []
 
     for page_num in range(len(pdf)):
         page = pdf[page_num]
@@ -55,15 +53,23 @@ def load_pdf(path: str) -> List[Document]:
 def load_docx(path: str) -> List[Document]:
     """
     Загрузить DOCX.
-
     DOCX не имеет страниц, поэтому весь текст — один Document.
+    Пропускает повреждённые/нестандартные файлы без падения.
     """
     filename = os.path.basename(path)
-    docx_doc = DocxDocument(path)
 
-    # Собираем текст из всех абзацев
-    paragraphs = [p.text for p in docx_doc.paragraphs if p.text.strip()]
-    text = "\n".join(paragraphs)
+    try:
+        docx_doc = DocxDocument(path)
+    except Exception as e:
+        print(f"  [loader] Пропуск {filename}: повреждённый файл ({e})")
+        return []
+
+    try:
+        paragraphs = [p.text for p in docx_doc.paragraphs if p.text.strip()]
+        text = "\n".join(paragraphs)
+    except Exception as e:
+        print(f"  [loader] Пропуск {filename}: ошибка чтения ({e})")
+        return []
 
     if not text.strip():
         return []

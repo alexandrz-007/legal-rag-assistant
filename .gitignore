@@ -16,6 +16,9 @@ data/uploads/
 # Eval results
 eval/report.json
 
+# Thumbnails (generated, not committed)
+Image/thumb/
+
 # OS
 Thumbs.db
 .DS_Store
