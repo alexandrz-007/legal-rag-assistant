@@ -2,8 +2,6 @@
 
 **RAG-система для юридических документов** — поиск по базе, Q&A с источниками, извлечение сущностей, оценка качества AI-ответов.
 
-Проект создан как демонстрация навыков для позиции **Младший инженер-исследователь (AI)**: RAG-пайплайны, embeddings, LLM-интеграции, промпт-инжиниринг, оценка качества.
-
 ---
 
 ## 🎯 Что умеет
@@ -34,13 +32,13 @@
                     ┌────────▼─────────┐
                     │   chunker.py     │  LangChain
                     │  разбиение на    │  RecursiveCharacterTextSplitter
-                    │  чанки (500 симв)│  500 символов, overlap 50
+                    │  чанки (1000 симв)│  1000 символов, overlap 200
                     └────────┬─────────┘
                              │
                     ┌────────▼─────────┐
-                    │  vectorstore.py  │  ChromaDB
+                    │  vectorstore.py  │  ChromaDB + BM25
                     │  embeddings +    │  all-MiniLM-L6-v2 (локально)
-                    │  векторный поиск │
+                    │  векторный поиск │  гибридный поиск
                     └────────┬─────────┘
                              │
                      ┌───────┴────────┐
@@ -64,13 +62,13 @@
 Вопрос пользователя
     │
     ▼
-1. Embedding вопроса
+1. Гибридный поиск: embeddings (top-12) + BM25 (top-12)
     │
     ▼
-2. similarity_search(top_k=5)  ← ChromaDB
+2. Объединение результатов, удаление дубликатов
     │
     ▼
-3. Сборка контекста: 5 чанков + метаданные
+3. Сборка контекста: чанки + метаданные источников
     │
     ▼
 4. Системный промпт: "Отвечай только на основе контекста.
@@ -92,13 +90,14 @@ legal-rag-assistant/
 ├── app.py                     # Streamlit веб-интерфейс
 ├── requirements.txt           # Python зависимости
 ├── Dockerfile                 # Docker-контейнер
+├── docker-compose.yml         # Docker Compose
 ├── .env.example               # Шаблон конфигурации
 │
 ├── src/
 │   ├── config.py              # Настройки (API ключи, пути, параметры)
 │   ├── loader.py              # Загрузка PDF/DOCX → Document[]
 │   ├── chunker.py             # Разбиение на чанки (LangChain)
-│   ├── vectorstore.py         # ChromaDB: embeddings + search
+│   ├── vectorstore.py         # ChromaDB + BM25: гибридный поиск
 │   ├── rag.py                 # RAG-пайплайн: вопрос → ответ + источники
 │   └── extractor.py           # Извлечение сущностей (LLM → JSON)
 │
@@ -141,70 +140,36 @@ legal-rag-assistant/
 
 ---
 
-## 🚀 Быстрый старт
+## 🚀 Установка и запуск
 
-### Вариант A: Docker (рекомендуется для собеседования)
+### Вариант A: Docker
 
 ```bash
-# 1. Клонировать
-git clone https://github.com/alexandrz-007/legal-rag-assistant.git
-cd legal-rag-assistant
-
-# 2. Создать .env с API ключом
+git clone https://github.com/alexandrz-007/-legal-rag-assistant.git
+cd -legal-rag-assistant
 echo "OPENROUTER_API_KEY=sk-or-ваш_ключ" > .env
-
-# 3. Запустить
 docker compose up --build
 ```
 
 Открыть: `http://localhost:8501`
 
-### Вариант B: Локально (без Docker)
+### Вариант B: Локально
 
 ```bash
-git clone https://github.com/alexandrz-007/legal-rag-assistant.git
-cd legal-rag-assistant
+git clone https://github.com/alexandrz-007/-legal-rag-assistant.git
+cd -legal-rag-assistant
 pip install -r requirements.txt
 echo "OPENROUTER_API_KEY=sk-or-ваш_ключ" > .env
 streamlit run app.py
 ```
 
-### Использование
-
-1. Нажми **«🔄 Переиндексировать»** в боковой панели
-2. Задай вопрос в чате
-3. Проверь вкладки «Сущности» и «Оценка»
-
----
-
-### 1. Установка зависимостей
-
-```bash
-cd legal-rag-assistant
-pip install -r requirements.txt
-```
-
-### 2. Настройка API ключа
-
-```bash
-copy .env.example .env
-# Открой .env и вставь свой OpenRouter API ключ:
-# OPENROUTER_API_KEY=sk-or-v1-...
-```
-
-Получить ключ: https://openrouter.ai/keys
-
-### 3. Запуск веб-интерфейса
-
-```bash
-streamlit run app.py
-```
-
 Откроется браузер: `http://localhost:8501`
 
-### 4. Использование
+Получить API ключ: https://openrouter.ai/keys
 
-1. Нажми **«Индексировать»** в боковой панели (загрузит 15 документов в векторную БД)
+### Использование
+
+1. Нажми **«🔄 Переиндексировать»** в боковой панели (загрузит 15 документов в векторную БД)
 2. Задай вопрос в чате, например:
    - "Какой штраф за разглашение конфиденциальной информации?"
    - "Кто отвечает за обработку персональных данных?"
@@ -220,11 +185,12 @@ streamlit run app.py
 |-----------|-----------|-------|
 | Embeddings | sentence-transformers (all-MiniLM-L6-v2) | Локальные embeddings, без API |
 | Vector DB | ChromaDB | Локальное хранение, персистентность |
+| Ключевые слова | BM25 (rank-bm25) | Точный поиск сумм, процентов, номеров |
 | LLM | OpenRouter API (gemini-2.5-flash) | Генерация ответов, извлечение сущностей |
 | Framework | LangChain | Text splitter, document abstraction |
 | Парсинг PDF | PyMuPDF (fitz) | Быстрый, надёжный, постраничный |
 | Парсинг DOCX | python-docx | Стандарт для Word |
-| UI | Streamlit | Быстрый прототип, чат-интерфейс |
+| UI | Streamlit | Веб-интерфейс, чат |
 | Контейнер | Docker | Портабельность |
 
 ---
@@ -233,41 +199,13 @@ streamlit run app.py
 
 Система включает 10 тест-кейсов с эталонными ответами. Метрики:
 
-- **Source Recall** — найден ли правильный источник?
-- **Answer Faithfulness** — не выдуман ли ответ? (LLM-асессор)
-- **Refusal Accuracy** — правильно ли отказывается, когда данных нет?
+- **Source Recall** — найден ли правильный источник? (100%)
+- **Answer Faithfulness** — не выдуман ли ответ? (89%)
+- **Refusal Accuracy** — правильно ли отказывается, когда данных нет? (100%)
+
+Результат: **9/10 тестов пройдено (90%)**
 
 Запуск: вкладка «Оценка» в UI → кнопка «Запустить тесты».
-
----
-
-## 🎥 Демонстрация для собеседования
-
-### Что показывает проект
-
-| Требование вакансии | Где в проекте |
-|---------------------|---------------|
-| RAG-пайплайны | `loader.py` → `chunker.py` → `vectorstore.py` → `rag.py` |
-| LLM, промптинг | `rag.py` — системный промпт для юр. Q&A |
-| Embeddings, vector search | `vectorstore.py` — ChromaDB + MiniLM |
-| Извлечение данных из документов | `extractor.py` |
-| Оценка качества AI (галлюцинации) | `eval/evaluate.py` |
-| LangChain | `chunker.py` — RecursiveCharacterTextSplitter |
-| Python | Весь проект |
-| API, REST, JSON | OpenRouter integration |
-| Git | Репозиторий |
-| Docker | `Dockerfile` |
-| no-code (n8n) | Отдельный репо: n8n-telegram-text-image-agent |
-
-### Как рассказывать
-
-> "Я собрал RAG-систему для юридических документов. Загружаю PDF, разбиваю
-> на чанки через LangChain, векторизую локальной моделью MiniLM, храню в
-> ChromaDB. Поиск — top-5 релевантных чанков, потом LLM через OpenRouter
-> генерирует ответ с обязательными ссылками на источник. Есть оценка
-> качества — 10 тест-кейсов с метриками recall и faithfulness.
-> Раньше работал с n8n — собрал Telegram AI-ассистента с памятью и
-> генерацией изображений."
 
 ---
 
